@@ -1,0 +1,67 @@
+Pseudocode
+
+BEGIN
+    // Predefined default study materials
+    DEFAULT_MATERIALS = {
+        "Mathematics": "Numbers, shapes, patterns...",
+        "English Language Arts": "Reading, writing...",
+        ... (all other default entries)
+    }
+
+    FUNCTION load_materials(file_path):
+        materials = COPY(DEFAULT_MATERIALS)
+        
+        IF FILE_NOT_EXISTS(file_path):
+            PRINT "Note: File not found. Using defaults."
+            RETURN materials
+        
+        loaded = False
+        OPEN file_path FOR READING WITH UTF-8 ENCODING AS file:
+            FOR EACH line IN file:
+                line = TRIM(line)
+                IF line CONTAINS "::":
+                    [title, content] = SPLIT(line AT FIRST "::")
+                    materials[TRIM(title)] = TRIM(content)
+                    loaded = True
+        
+        IF NOT loaded:
+            PRINT "Note: File empty/invalid. Using defaults."
+        
+        RETURN materials
+
+    FUNCTION search_materials(materials, keyword):
+        lower_kw = LOWERCASE(keyword)
+        results = EMPTY_DICTIONARY
+        
+        FOR EACH (title, content) IN materials:
+            IF lower_kw IN LOWERCASE(title) OR lower_kw IN LOWERCASE(content):
+                results[title] = content
+        
+        RETURN results
+
+    FUNCTION display_materials(results):
+        IF results IS EMPTY:
+            PRINT "No matches found."
+        ELSE:
+            PRINT "Found " + LENGTH(results) + " material(s):"
+            i = 1
+            FOR EACH (title, content) IN results:
+                PRINT i + ". " + title
+                PRINT "   " + content
+                i = i + 1
+
+    FUNCTION main():
+        PRINT "Welcome to CampusMind: Digital Study Material Finder"
+        materials = load_materials("materials.txt")
+        
+        WHILE TRUE:
+            INPUT = PROMPT("Enter keyword (or 'exit'): ").STRIP()
+            IF LOWERCASE(INPUT) == "exit":
+                BREAK
+            results = search_materials(materials, INPUT)
+            display_materials(results)
+        
+        PRINT "Goodbye!"
+
+    CALL main()
+END
